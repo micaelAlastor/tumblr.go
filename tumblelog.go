@@ -47,6 +47,7 @@ type Blog struct {
 	Subscribed           bool   `json:"subscribed"`
 	TotalPosts           int64  `json:"total_posts"`
 	Updated              int64  `json:"updated"`
+	UUID                 string `json:"uuid"`
 }
 
 // Convenience method converting a Blog into a JSON representation
