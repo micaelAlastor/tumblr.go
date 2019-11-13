@@ -83,6 +83,7 @@ type Post struct {
 		Comment  string `json:"comment"`
 		TreeHTML string `json:"tree_html"`
 	} `json:"reblog"`
+	Notes             []Note            `json:"notes"`
 	RecommendedColor  string            `json:"recommended_color"`
 	RecommendedSource bool              `json:"recommended_source"`
 	ShortUrl          string            `json:"short_url"`
@@ -96,6 +97,16 @@ type Post struct {
 	FeaturedTimestamp uint64            `json:"featured_timestamp,omitempty"`
 	TrackName         string            `json:"track_name,omitempty"`
 	Trail             []ReblogTrailItem `json:"trail"`
+}
+
+type Note struct {
+	Type        string `json:"type"`
+	Timestamp   uint64 `json:"timestamp"`
+	BlogName    string `json:"blog_name"`
+	BlogUUID    string `json:"blog_uuid"`
+	BlogUrl     string `json:"blog_url"`
+	Followed    bool   `json:"followed"`
+	AvatarShape string `json:"avatar_shape"`
 }
 
 // ReblogTrailItem represents an item in the "trail" to the original, root Post.
