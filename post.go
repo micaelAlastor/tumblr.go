@@ -107,6 +107,11 @@ type Note struct {
 	BlogUrl     string `json:"blog_url"`
 	Followed    bool   `json:"followed"`
 	AvatarShape string `json:"avatar_shape"`
+	//for reply notes
+	ReplyText string `json:"reply_text"`
+	//for reblog notes
+	PostID               string `json:"post_id"`
+	ReblogParentBlogName string `json:"reblog_parent_blog_name"`
 }
 
 // ReblogTrailItem represents an item in the "trail" to the original, root Post.
