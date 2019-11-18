@@ -95,6 +95,29 @@ func GetAvatar(client ClientInterface, name string) (string, error) {
 	return "", errors.New("Unable to detect avatar location")
 }
 
+// This method can be used to retrieve the publicly exposed likes from a blog.
+// Just like for user's likesURL values can include:
+// 	limit (int)
+//	offset (int)
+//	before (timestamp)
+//	after (timestamp)
+func GetBlogLikes(client ClientInterface, name string, params url.Values) (*Likes, error) {
+	response, err := client.GetWithParams(blogPath("/blog/%s/likes", name), params)
+	if err != nil {
+		return nil, err
+	}
+
+	result := struct {
+		Response Likes `json:"response"`
+	}{}
+	if err = json.Unmarshal(response.body, &result); err != nil {
+		return nil, err
+	}
+	result.Response.client = client
+	result.Response.response = &response
+	return &result.Response, nil
+}
+
 // Create a BlogRef
 func NewBlogRef(client ClientInterface, name string) *BlogRef {
 	return &BlogRef{
@@ -108,7 +131,12 @@ func (b *BlogRef) GetInfo() (*Blog, error) {
 	return GetBlogInfo(b.client, b.Name)
 }
 
-// Retrieves blog avatar for the given blog reference
+// This method can be used to retrieve the publicly exposed likes from a blog.
+func (b *BlogRef) GetLikes(params url.Values) (*Likes, error) {
+	return GetBlogLikes(b.client, b.Name, params)
+}
+
+// Retrieves blog likes for the given blog reference
 func (b *BlogRef) GetAvatar() (string, error) {
 	return GetAvatar(b.client, b.Name)
 }
