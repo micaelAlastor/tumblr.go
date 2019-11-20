@@ -83,20 +83,32 @@ type Post struct {
 		Comment  string `json:"comment"`
 		TreeHTML string `json:"tree_html"`
 	} `json:"reblog"`
-	Notes             []Note            `json:"notes"`
-	RecommendedColor  string            `json:"recommended_color"`
-	RecommendedSource bool              `json:"recommended_source"`
-	ShortUrl          string            `json:"short_url"`
-	Slug              string            `json:"slug"`
-	SourceTitle       string            `json:"source_title"`
-	SourceUrl         string            `json:"source_url"`
-	State             string            `json:"state"`
-	Summary           string            `json:"summary"`
-	Tags              []string          `json:"tags"`
-	Timestamp         uint64            `json:"timestamp"`
-	FeaturedTimestamp uint64            `json:"featured_timestamp,omitempty"`
-	TrackName         string            `json:"track_name,omitempty"`
-	Trail             []ReblogTrailItem `json:"trail"`
+	Notes             []Note   `json:"notes"`
+	RecommendedColor  string   `json:"recommended_color"`
+	RecommendedSource bool     `json:"recommended_source"`
+	ShortUrl          string   `json:"short_url"`
+	Slug              string   `json:"slug"`
+	SourceTitle       string   `json:"source_title"`
+	SourceUrl         string   `json:"source_url"`
+	State             string   `json:"state"`
+	Summary           string   `json:"summary"`
+	Tags              []string `json:"tags"`
+	Timestamp         uint64   `json:"timestamp"`
+	FeaturedTimestamp uint64   `json:"featured_timestamp,omitempty"`
+	TrackName         string   `json:"track_name,omitempty"`
+
+	//NPF posts
+	Content []NpfContent `json:"content"`
+	Trail   []NpfTrail   `json:"trail"`
+}
+
+type BlogMiniInfo struct {
+	Name        string `json:"name"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Url         string `json:"url"`
+	Updated     uint64 `json:"updated"`
+	UUID        string `json:"uuid"`
 }
 
 type Note struct {
@@ -114,17 +126,45 @@ type Note struct {
 	ReblogParentBlogName string `json:"reblog_parent_blog_name"`
 }
 
-// ReblogTrailItem represents an item in the "trail" to the original, root Post.
-type ReblogTrailItem struct {
-	Blog          Blog   `json:"blog"`
-	Content       string `json:"content"`
-	ContentRaw    string `json:"content_raw"`
-	IsCurrentItem bool   `json:"is_current_item"`
-	IsRootItem    bool   `json:"is_root_item,omitempty"`
-	Post          struct {
-		// sometimes an actual int, sometimes a numeric string, always a headache
-		Id interface{} `json:"id"`
-	} `json:"post"`
+type NpfContent struct {
+	//general
+	Type    string `json:"type"`
+	Subtype string `json:"subtype"`
+	//for text content
+	Text string `json:"text"`
+	//for media content
+	Media   []NpfMedia `json:"media"`
+	AltText string     `json:"alt_text"`
+	//for link content
+	Url         string   `json:"url"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Author      string   `json:"author"`
+	SiteName    string   `json:"site_name"`
+	Poster      NpfMedia `json:"poster"`
+	//audio and video ignored
+}
+
+type NpfMedia struct {
+	Type   string `json:"type"`
+	Url    string `json:"url"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
+}
+
+type NpfTrail struct {
+	Post       TrailPost    `json:"post"`
+	Blog       BlogMiniInfo `json:"blog"`
+	Content    []NpfContent `json:"content"`
+	BrokenBlog BrokenBlog   `json:"broken_blog"` //in case trail post is unavailable. instead of post basically
+}
+
+type TrailPost struct {
+	Id uint64 `json:"id"`
+}
+
+type BrokenBlog struct {
+	Name string `json:"name"`
 }
 
 // PostInterface is the interface for any concrete Post type to retrieve a property.
@@ -247,9 +287,9 @@ func (sb *StringOrBool) UnmarshalJSON(b []byte) error {
 	}
 
 	if bl {
-		*sb = StringOrBool("true")
+		*sb = "true"
 	} else {
-		*sb = StringOrBool("false")
+		*sb = "false"
 	}
 	return nil
 }
@@ -313,7 +353,7 @@ func GetSubmissions(client ClientInterface, name string, params url.Values) (*Po
 // Util method for decoding the response and converting the resulting ID into a PostRef
 func doPost(client ClientInterface, path, blogName string, params url.Values) (*PostRef, error) {
 	if blogName == "" {
-		return nil, errors.New("No blog name provided")
+		return nil, errors.New("no blog name provided")
 	}
 	response, err := client.PostWithParams(blogPath(path, blogName), params)
 	if err != nil {
@@ -374,7 +414,7 @@ func (p *PostRef) Edit(params url.Values) error {
 // ReblogPost will reblog the post in postId and reblogKey to the blog blogName.
 func ReblogPost(client ClientInterface, blogName string, postId uint64, reblogKey string, params url.Values) (*PostRef, error) {
 	if reblogKey == "" {
-		return nil, errors.New("No reblog key provided")
+		return nil, errors.New("no reblog key provided")
 	}
 	params.Set("reblog_key", reblogKey)
 	return doPost(client, "/blog/%s/post/reblog", blogName, setPostId(postId, params))
