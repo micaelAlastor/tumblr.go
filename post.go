@@ -136,12 +136,13 @@ type NpfContent struct {
 	Media   []NpfMedia `json:"media"`
 	AltText string     `json:"alt_text"`
 	//for link content
-	Url         string   `json:"url"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Author      string   `json:"author"`
-	SiteName    string   `json:"site_name"`
-	Poster      NpfMedia `json:"poster"`
+	Url         string `json:"url"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Author      string `json:"author"`
+	SiteName    string `json:"site_name"`
+	//poster can be either Media or array of so we omit it for now
+	//Poster      NpfMedia `json:"poster"`
 	//audio and video ignored
 }
 
