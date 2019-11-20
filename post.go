@@ -160,7 +160,7 @@ type NpfTrail struct {
 }
 
 type TrailPost struct {
-	Id uint64 `json:"id"`
+	Id string `json:"id"`
 }
 
 type BrokenBlog struct {
