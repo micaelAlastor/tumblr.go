@@ -133,8 +133,8 @@ type NpfContent struct {
 	//for text content
 	Text string `json:"text"`
 	//for media content
-	Media   []NpfMedia `json:"media"`
-	AltText string     `json:"alt_text"`
+	Media   NpfMediaContainer `json:"media"`
+	AltText string            `json:"alt_text"`
 	//for link content
 	Url         string `json:"url"`
 	Title       string `json:"title"`
@@ -142,8 +142,35 @@ type NpfContent struct {
 	Author      string `json:"author"`
 	SiteName    string `json:"site_name"`
 	//poster can be either Media or array of so we omit it for now
-	//Poster      NpfMedia `json:"poster"`
+	Poster NpfMediaContainer `json:"poster"`
 	//audio and video ignored
+}
+
+type NpfMediaContainer struct {
+	media           NpfMedia
+	mediaCollection []NpfMedia
+}
+
+func (n *NpfMediaContainer) UnmarshalJSON(data []byte) error {
+	switch data[0] {
+	case '[':
+		mediaCollection := make([]NpfMedia, 0)
+		if err := json.Unmarshal(data, &mediaCollection); err != nil {
+			return err
+		}
+		n.mediaCollection = mediaCollection
+	case '{':
+		media := NpfMedia{}
+		if err := json.Unmarshal(data, &media); err != nil {
+			return err
+		}
+		n.media = media
+
+	default:
+		return errors.New("unexpected char or whatever")
+	}
+
+	return nil
 }
 
 type NpfMedia struct {
