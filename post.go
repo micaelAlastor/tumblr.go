@@ -131,7 +131,8 @@ type NpfContent struct {
 	Type    string `json:"type"`
 	Subtype string `json:"subtype"`
 	//for text content
-	Text string `json:"text"`
+	Text       string       `json:"text"`
+	Formatting []Formatting `json:"formatting"`
 	//for media content
 	Media   NpfMediaContainer `json:"media"`
 	AltText string            `json:"alt_text"`
@@ -144,6 +145,14 @@ type NpfContent struct {
 	//poster can be either Media or array of so we omit it for now
 	Poster NpfMediaContainer `json:"poster"`
 	//audio and video ignored
+}
+
+type Formatting struct {
+	Type string `json:"type"`
+	//for link type formatting
+	Url string `json:"url"`
+	//for mention type formatting
+	Blog BlogMiniInfo `json:"blog"`
 }
 
 type NpfMediaContainer struct {
