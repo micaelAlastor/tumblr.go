@@ -156,8 +156,9 @@ type Formatting struct {
 }
 
 type NpfMediaContainer struct {
-	media           NpfMedia
-	mediaCollection []NpfMedia
+	Media           NpfMedia
+	MediaCollection []NpfMedia
+	IsArray         bool
 }
 
 func (n *NpfMediaContainer) UnmarshalJSON(data []byte) error {
@@ -167,14 +168,15 @@ func (n *NpfMediaContainer) UnmarshalJSON(data []byte) error {
 		if err := json.Unmarshal(data, &mediaCollection); err != nil {
 			return err
 		}
-		n.mediaCollection = mediaCollection
+		n.MediaCollection = mediaCollection
+		n.IsArray = true
 	case '{':
 		media := NpfMedia{}
 		if err := json.Unmarshal(data, &media); err != nil {
 			return err
 		}
-		n.media = media
-
+		n.Media = media
+		n.IsArray = false
 	default:
 		return errors.New("unexpected char or whatever")
 	}
