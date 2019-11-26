@@ -14,18 +14,6 @@ type ClientInterface interface {
 	Get(endpoint string) (Response, error)
 	// Issue GET request to Tumblr API with param values
 	GetWithParams(endpoint string, params url.Values) (Response, error)
-	// Issue POST request to Tumblr API
-	Post(endpoint string) (Response, error)
-	// Issue POST request to Tumblr API with param values
-	PostWithParams(endpoint string, params url.Values) (Response, error)
-	// Issue PUT request to Tumblr API
-	Put(endpoint string) (Response, error)
-	// Issue PUT request to Tumblr API with param values
-	PutWithParams(endpoint string, params url.Values) (Response, error)
-	// Issue DELETE request to Tumblr API
-	Delete(endpoint string) (Response, error)
-	// Issue DELETE request to Tumblr API with param values
-	DeleteWithParams(endpoint string, params url.Values) (Response, error)
 }
 
 // shortcut for the most common case

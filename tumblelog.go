@@ -14,18 +14,6 @@ type BlogRef struct {
 	Name   string `json:"name"`
 }
 
-// Subset of blog information, returned in the list of blogs belonging to a user (see: GetUserInfo)
-type ShortBlog struct {
-	BlogRef
-	Url            string `json:"url"`
-	Title          string `json:"title"`
-	IsPrimary      bool   `json:"primary"`
-	FollowerCount  uint32 `json:"followers"`
-	PostToTwitter  string `json:"tweet"`
-	PostToFacebook string `json:"facebook"`
-	Visibility     string `json:"type"`
-}
-
 // Tumblelog struct
 type Blog struct {
 	BlogRef
@@ -95,29 +83,6 @@ func GetAvatar(client ClientInterface, name string) (string, error) {
 	return "", errors.New("Unable to detect avatar location")
 }
 
-// This method can be used to retrieve the publicly exposed likes from a blog.
-// Just like for user's likesURL values can include:
-// 	limit (int)
-//	offset (int)
-//	before (timestamp)
-//	after (timestamp)
-func GetBlogLikes(client ClientInterface, name string, params url.Values) (*Likes, error) {
-	response, err := client.GetWithParams(blogPath("/blog/%s/likes", name), params)
-	if err != nil {
-		return nil, err
-	}
-
-	result := struct {
-		Response Likes `json:"response"`
-	}{}
-	if err = json.Unmarshal(response.body, &result); err != nil {
-		return nil, err
-	}
-	result.Response.client = client
-	result.Response.response = &response
-	return &result.Response, nil
-}
-
 // Create a BlogRef
 func NewBlogRef(client ClientInterface, name string) *BlogRef {
 	return &BlogRef{
@@ -131,59 +96,14 @@ func (b *BlogRef) GetInfo() (*Blog, error) {
 	return GetBlogInfo(b.client, b.Name)
 }
 
-// This method can be used to retrieve the publicly exposed likes from a blog.
-func (b *BlogRef) GetLikes(params url.Values) (*Likes, error) {
-	return GetBlogLikes(b.client, b.Name, params)
-}
-
-// Retrieves blog likes for the given blog reference
-func (b *BlogRef) GetAvatar() (string, error) {
-	return GetAvatar(b.client, b.Name)
-}
-
-// Retrieves blog's followers for the given blog reference
-func (b *BlogRef) GetFollowers() (*FollowerList, error) {
-	return GetFollowers(b.client, b.Name, 0, 0)
-}
-
 // Retrieves blog's posts for the given blog reference
 func (b *BlogRef) GetPosts(params url.Values) (*Posts, error) {
 	return GetPosts(b.client, b.Name, params)
 }
 
-// Retrieves blog's queue for the given blog reference
-func (b *BlogRef) GetQueue(params url.Values) (*Posts, error) {
-	return GetQueue(b.client, b.Name, params)
-}
-
-// Retrieves blog's drafts for the given blog reference
-func (b *BlogRef) GetDrafts(params url.Values) (*Posts, error) {
-	return GetDrafts(b.client, b.Name, params)
-}
-
-// Creates a post on the blog represented by BlogRef
-func (b *BlogRef) CreatePost(params url.Values) (*PostRef, error) {
-	return CreatePost(b.client, b.Name, params)
-}
-
-// Reblogs a post to the blog represented by BlogRef
-func (b *BlogRef) ReblogPost(p *PostRef, params url.Values) (*PostRef, error) {
-	return p.ReblogOnBlog(b.Name, params)
-}
-
 // Retrieves name property
 func (b *BlogRef) getName() string {
 	return b.Name
-}
-
-// Follows this blog for the current user (based on OAuth user token/secret)
-func (b *BlogRef) Follow() error {
-	return Follow(b.client, b.getName())
-}
-
-// Unfollows this blog for the current user (based on OAuth user token/secret)
-func (b *BlogRef) Unfollow() error {
-	return Unfollow(b.client, b.getName())
 }
 
 // Helper function to allow for less verbose code
